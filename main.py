@@ -13,6 +13,8 @@ import base64
 from langchain.embeddings import CohereEmbeddings
 import cohere
 from langchain.prompts import PromptTemplate
+from langchain.memory import ConversationBufferWindowMemory
+
 
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
 
@@ -21,7 +23,7 @@ if not os.path.exists("./Temp_Files"):
     os.makedirs("./Temp_Files")
 st.set_page_config(page_title="Chat With PDF", page_icon=":smile:")
 
-tab1, tab2 = st.tabs(["📈 Chat", "🗃 PDF"])
+tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 PDF"])
 
 tab1.markdown(
     "<h1 style='text-align: center;'>Chat With PDF</h1>",
@@ -46,7 +48,7 @@ with st.sidebar:
     counter_placeholder = st.empty()
     clear_button = st.button("Clear Conversation", key="clear")
 
-text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=5)
+text_splitter = CharacterTextSplitter(chunk_size=300, chunk_overlap=10)
 
 flan_ul2 = HuggingFaceHub(
     repo_id="google/flan-ul2",
@@ -57,7 +59,7 @@ flan_ul2 = HuggingFaceHub(
 )
 
 embeddings = CohereEmbeddings(
-    model="small", cohere_api_key="4ReeiiO3StqicxM8vJT4cWiIL51jT7MLMWOkQdRw"
+    model="large", cohere_api_key="4ReeiiO3StqicxM8vJT4cWiIL51jT7MLMWOkQdRw"
 )
 
 
@@ -71,10 +73,14 @@ if uploaded_file is not None:
     )
 
 
+tab2.header("Preview of PDF")
+
+
 def show_pdf(file_path):
     with open(file_path, "rb") as f:
         base64_pdf = base64.b64encode(f.read()).decode("utf-8")
-    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="800" height="800" type="application/pdf"></iframe>'
+
+    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="1000" type="application/pdf"></iframe>'
     tab2.markdown(pdf_display, unsafe_allow_html=True)
 
 
@@ -82,7 +88,7 @@ def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
     prompt_template = """Use the following pieces of context to answer the question at the end.
-    You are A chatbot designed for helping with PDF files, specifically for communicating with them. 
+    You are A Assistant designed for helping with PDF files, specifically for communicating with them. 
     If you are unable to provide an answer to a question, simply state that you do not know rather than attempting to provide a false or inaccurate response.
 
     {context}
@@ -107,10 +113,14 @@ def PDF_loader(document):
     return "Ready"
 
 
+if "chat_history" not in st.session_state:
+    st.session_state["chat_history"] = []
+
+
 def generate_response(query):
-    result = qa({"query": query})
+    result = qa({"query": query, "chat_history": st.session_state["chat_history"]})
     print(result["result"])
-    print(result["source_documents"])
+    # print(result["source_documents"])
     return result["result"]
 
 
@@ -121,41 +131,46 @@ if "generated" not in st.session_state:
     st.session_state["generated"] = []
 if "past" not in st.session_state:
     st.session_state["past"] = []
-if "messages" not in st.session_state:
-    st.session_state["messages"] = [
-        {"role": "system", "content": "You are a helpful assistant."}
-    ]
-
 
 response_container = tab1.container()
 container = tab1.container()
 
 with container:
-    with st.form(key="my_form", clear_on_submit=True):
-        user_input = st.text_area("You:", key="input", height=100)
-        submit_button = st.form_submit_button(label="Send")
+    # with st.form(key="my_form", clear_on_submit=True):
+    user_input = st.text_input("You:", key="input")
+    # submit_button = st.form_submit_button(label="Send")
 
-    if submit_button and user_input:
-        output = generate_response(user_input)
-        print(output)
-        st.session_state["past"].append(user_input)
-        st.session_state["generated"].append(output)
+    if user_input:
+        if uploaded_file is not None:
+            output = generate_response(user_input)
+            print(output)
+            st.session_state["past"].append(user_input)
+            st.session_state["generated"].append(output)
+            st.session_state["chat_history"] = [(user_input, output)]
+        else:
+            st.session_state["past"].append(user_input)
+            st.session_state["generated"].append(
+                "Please go ahead and upload the PDF in the sidebar, it would be great to have it there."
+            )
 
 
 if st.session_state["generated"]:
     with response_container:
         for i in range(len(st.session_state["generated"])):
-            message(st.session_state["past"][i], is_user=True, key=str(i) + "_user")
+            message(
+                st.session_state["past"][i],
+                is_user=True,
+                key=str(i) + "_user",
+                avatar_style="adventurer",
+                seed=123,
+            )
             message(st.session_state["generated"][i], key=str(i))
 
 
 if clear_button:
     st.session_state["generated"] = []
     st.session_state["past"] = []
-    st.session_state["messages"] = [
-        {"role": "system", "content": "You are a helpful assistant."}
-    ]
-
+    st.session_state["chat_history"] = []
 # show pdf in tab2
 
 if uploaded_file is not None:
