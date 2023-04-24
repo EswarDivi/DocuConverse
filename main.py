@@ -57,7 +57,7 @@ flan_ul2 = HuggingFaceHub(
 )
 
 embeddings = CohereEmbeddings(
-    model="large", cohere_api_key="4ReeiiO3StqicxM8vJT4cWiIL51jT7MLMWOkQdRw"
+    model="small", cohere_api_key="4ReeiiO3StqicxM8vJT4cWiIL51jT7MLMWOkQdRw"
 )
 
 
