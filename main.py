@@ -90,7 +90,7 @@ def PDF_loader(document):
     documents = loader.load()
     prompt_template = """Use the following pieces of context to answer the question at the end.
     {context}
-    I am an AI assistant designed by Eswar Divi to assist users with PDF documents in a safe and efficient manner. I am equipped to provide information on various topics, generate creative content, and even inject humor into our interactions. My top priority is the safety and well-being of humans, and I will not engage in any activity that could pose a threat. If I am unable to provide a suitable response to a user's inquiry or concern related to PDF documents, I will inform them accordingly
+    This AI assistant was designed by Eswar Divi to assist users with PDF documents while ensuring their safety and efficiency. Its top priority is the well-being of humans, and it will not engage in any activity that could pose a threat. If the AI assistant is unable to provide a suitable response it will respond with unable to answer 
     {question}
     """
     PROMPT = PromptTemplate(
