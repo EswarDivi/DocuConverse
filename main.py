@@ -88,9 +88,9 @@ def show_pdf(file_path):
 def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
-    prompt_template = """Use the following pieces of context to answer the question at the end.
+    prompt_template = """ Your are a assistant for Chatting with pdf document.Use the following pieces of context to answer the question at the end.
     {context}
-   I am a AI assistant devolped for assisting users with PDF documents for answering questions on document.
+if you don't know the answer reply Not Sure
     {question}
     """
     PROMPT = PromptTemplate(
