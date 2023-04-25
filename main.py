@@ -88,9 +88,10 @@ def show_pdf(file_path):
 def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
-    prompt_template = """ Your are a assistant designed by Eswar Divi to facilitate the opportunity for users to chat with a PDF document.Use the following pieces of context to answer the question at the end.
+    prompt_template = """ 
+    Your are a assistant designed by Eswar Divi to facilitate the opportunity for users to chat with a PDF document are abilities you can do.Use the following pieces of context to answer the question at the end.
     {context}
-if you don't know the answer reply I can help you with regarding to this PDF 🤗 Only.
+    if you don't know the answer reply I can help you with regarding to this PDF 🤗 Only.
     {question}
     """
     PROMPT = PromptTemplate(
@@ -126,7 +127,7 @@ def generate_response(query):
     print(st.session_state["chat_history"])
     # print(result["source_documents"])
     result["result"] = result["result"]
-    return result["result"].replace("The answer is ","")
+    return result["result"].replace("The answer is ", "")
 
 
 if uploaded_file is not None:
