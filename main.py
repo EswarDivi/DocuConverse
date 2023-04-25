@@ -38,7 +38,7 @@ def save_uploadedfile(uploadedfile):
         "wb",
     ) as f:
         f.write(uploadedfile.getbuffer())
-    return st.sidebar.success("Saved File:{} to tempDir".format(uploadedfile.name))
+    return st.sidebar.success("Saved File".format(uploadedfile.name))
 
 
 with st.sidebar:
@@ -89,9 +89,9 @@ def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
     prompt_template = """ 
-    Your are a assistant designed by Eswar Divi to facilitate the opportunity for users to chat with a PDF document are abilities you can do.Use the following pieces of context to answer the question at the end.
+    Your are an AI Chatbot devolped to facilitate the opportunity for users to chat with a PDF document.Use the following pieces of context to answer the question at the end.
     {context}
-    if you don't know the answer reply I can help you with regarding to this PDF 🤗 Only.
+
     {question}
     """
     PROMPT = PromptTemplate(
@@ -132,6 +132,7 @@ def generate_response(query):
 
 if uploaded_file is not None:
     PDF_loader("Temp_Files/" + uploaded_file.name)
+    show_pdf("Temp_Files/" + uploaded_file.name)
 
 if "generated" not in st.session_state:
     st.session_state["generated"] = []
@@ -142,11 +143,11 @@ response_container = tab1.container()
 container = tab1.container()
 
 with container:
-    # with st.form(key="my_form", clear_on_submit=True):
-    user_input = st.text_input("You:", key="input")
-    # submit_button = st.form_submit_button(label="Send")
+    with st.form(key="my_form", clear_on_submit=True):
+        user_input = st.text_input("You:", key="input")
+        submit_button = st.form_submit_button(label="Send")
 
-    if user_input:
+    if user_input and submit_button:
         if uploaded_file is not None:
             output = generate_response(user_input)
             print(output)
@@ -177,7 +178,3 @@ if clear_button:
     st.session_state["generated"] = []
     st.session_state["past"] = []
     st.session_state["chat_history"] = []
-# show pdf in tab2
-
-if uploaded_file is not None:
-    show_pdf("Temp_Files/" + uploaded_file.name)
