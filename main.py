@@ -13,6 +13,7 @@ import base64
 from langchain.embeddings import CohereEmbeddings
 import cohere
 from langchain.prompts import PromptTemplate
+from langchain.llms import Cohere
 from langchain.memory import ConversationBufferWindowMemory
 
 
@@ -43,7 +44,7 @@ def save_uploadedfile(uploadedfile):
 with st.sidebar:
     st.title("Upload PDF")
     uploaded_file = st.file_uploader("Choose a file", type=["pdf"])
-    temperature = st.slider("Temperature", 0.1, 0.9, 0.5, 0.1)
+    temp_r = st.slider("Temperature", 0.1, 0.9, 0.5, 0.1)
     max_tokens = st.slider("Max Tokens", 16, 512, 192, 16)
     counter_placeholder = st.empty()
     clear_button = st.button("Clear Conversation", key="clear")
@@ -53,7 +54,7 @@ text_splitter = CharacterTextSplitter(chunk_size=300, chunk_overlap=10)
 flan_ul2 = HuggingFaceHub(
     repo_id="google/flan-ul2",
     model_kwargs={
-        "temperature": temperature,
+        "temperature": temp_r,
         "max_new_tokens": max_tokens,
     },
 )
@@ -88,12 +89,10 @@ def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
     prompt_template = """Use the following pieces of context to answer the question at the end.
-    You are A Assistant designed for helping with PDF files, specifically for communicating with them. 
-    If you are unable to provide an answer to a question, simply state that you do not know rather than attempting to provide a false or inaccurate response.
-
     {context}
-
-    Question: {question}"""
+    As an AI language model developed by Eswar Divi, the Assistant is specifically designed to assist with PDF files, particularly in communication with them. The Assistant is programmed to be helpful and harmless, and it will never engage in any activity that could potentially harm the user. The Assistant has the ability to provide information on various topics and possesses creative abilities such as writing poetry, short stories, and making jokes. However, the Assistant will always prioritize the safety and well-being of humans and will refuse to participate in anything that could cause harm. If the answer to a question is not available within the given text, the Assistant will inform the user accordingly.
+    {question}
+    """
     PROMPT = PromptTemplate(
         template=prompt_template, input_variables=["context", "question"]
     )
@@ -104,7 +103,11 @@ def PDF_loader(document):
     retriever = db.as_retriever()
     global qa
     qa = RetrievalQA.from_chain_type(
-        llm=flan_ul2,
+        llm=Cohere(
+            model="command-xlarge-nightly",
+            temperature=temp_r,
+            cohere_api_key="4ReeiiO3StqicxM8vJT4cWiIL51jT7MLMWOkQdRw",
+        ),
         chain_type="stuff",
         retriever=retriever,
         return_source_documents=True,
@@ -119,9 +122,11 @@ if "chat_history" not in st.session_state:
 
 def generate_response(query):
     result = qa({"query": query, "chat_history": st.session_state["chat_history"]})
-    print(result["result"])
+    print(result)
+    print(st.session_state["chat_history"])
     # print(result["source_documents"])
-    return result["result"]
+    result["result"] = result["result"]
+    return result["result"].replace("The answer is ","")
 
 
 if uploaded_file is not None:
