@@ -134,6 +134,14 @@ elif choice == "Chart Elements":
     with tab2:
         st.plotly_chart(fig, theme=None, use_container_width=True)
 
+    st.header("Map")
+
+    df = pd.DataFrame(
+    np.random.randn(100, 2) / [50, 50] + [11.016844, 76.955833],
+    columns=['lat', 'lon'])
+
+    st.map(df)
+
 
 elif choice == "Progress and Status Elements":
     my_bar = st.progress(0)
