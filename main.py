@@ -182,3 +182,4 @@ if clear_button:
     st.session_state["generated"] = []
     st.session_state["past"] = []
     st.session_state["chat_history"] = []
+    #
