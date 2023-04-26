@@ -94,7 +94,7 @@ def PDF_loader(document):
 
 if uploaded_file is not None:
     save_uploadedfile(uploaded_file)
-    PDF_loader("Temp_Files/" + uploaded_file.name)
+    PDF_loader("tempfolder/" + uploaded_file.name)
     tab1.markdown(
         "<h3 style='text-align: center;'>Now You Are Talking With "
         + uploaded_file.name
