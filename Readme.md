@@ -3,6 +3,10 @@
 
 Build a Chatbot that can answer questions from a PDF document using Langchain and Streamlit
 
+## Langchain
+
+Colab Notebook: click [here](https://colab.research.google.com/drive/1ZrQzc1RLEH7m1v86rykdRFfHqJMqjumw?usp=sharing)
+
 ## Environment Variables
 
 To run this project, you will need to add the following variables `cohere_apikey` in .`streamlit/secrets.toml` folder
@@ -42,7 +46,15 @@ Install dependencies
 To deploy this project run
 
 ```bash
-  streamlit run main.py
+  streamlit run Talkwithpdf.py
+```
+
+## Deployment on Streamlit Sharing
+
+To deploy this project on Streamlit Sharing, you will need to add the following variables `cohere_apikey` in Secrets section of the app
+
+```
+cohere_apikey = <your cohere api key>
 ```
 
 ## Authors
