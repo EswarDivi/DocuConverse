@@ -17,14 +17,14 @@ from langchain.llms import Cohere
 from langchain.memory import ConversationBufferWindowMemory
 
 
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = st.secrets["hf_apikey"]
 
 
 if not os.path.exists("./Temp_Files"):
     os.makedirs("./Temp_Files")
 st.set_page_config(page_title="Chat With PDF", page_icon=":smile:")
 
-tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 PDF"])
+tab1, tab2 ,tab3= st.tabs(["📈 Chat Here", ":smile PDF","🗃 Relevant Documents"])
 
 tab1.markdown(
     "<h1 style='text-align: center;'>Chat With PDF</h1>",
@@ -60,7 +60,7 @@ flan_ul2 = HuggingFaceHub(
 )
 
 embeddings = CohereEmbeddings(
-    model="large", cohere_api_key="4ReeiiO3StqicxM8vJT4cWiIL51jT7MLMWOkQdRw"
+    model="large", cohere_api_key=st.secrets["cohere_apikey"]
 )
 
 
@@ -89,7 +89,7 @@ def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
     prompt_template = """ 
-    Your are an AI Chatbot devolped to facilitate the opportunity for users to chat with a PDF document.Use the following pieces of context to answer the question at the end.
+    Your are an AI Chatbot devolped to help users to talk to a PDF document.Use the following pieces of context to answer the question at the end.Greet Users!!
     {context}
 
     {question}
@@ -107,7 +107,7 @@ def PDF_loader(document):
         llm=Cohere(
             model="command-xlarge-nightly",
             temperature=temp_r,
-            cohere_api_key="4ReeiiO3StqicxM8vJT4cWiIL51jT7MLMWOkQdRw",
+            cohere_api_key=st.secrets["cohere_apikey"],
         ),
         chain_type="stuff",
         retriever=retriever,
@@ -122,10 +122,14 @@ if "chat_history" not in st.session_state:
 
 
 def generate_response(query):
-    result = qa({"query": query, "chat_history": st.session_state["chat_history"]})
-    print(result)
-    print(st.session_state["chat_history"])
-    # print(result["source_documents"])
+    result = qa({"query": query, "chat_history": st.session_state["chat_history"]}) 
+
+    tab3.markdown(
+        "<h3 style='text-align: center;'>Relevant Documents Metadata</h3>",
+        unsafe_allow_html=True,
+    )
+
+    tab3.write(result["source_documents"])
     result["result"] = result["result"]
     return result["result"].replace("The answer is ", "")
 
