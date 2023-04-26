@@ -22,12 +22,12 @@ os.environ["HUGGINGFACEHUB_API_TOKEN"] = st.secrets["hf_apikey"]
 
 if not os.path.exists("./Temp_Files"):
     os.makedirs("./Temp_Files")
-st.set_page_config(page_title="Chat With PDF", page_icon=":smile:")
+st.set_page_config(page_title="Talk With PDF", page_icon=":smile:")
 
-tab1, tab2 ,tab3= st.tabs(["📈 Chat Here", ":smile PDF","🗃 Relevant Documents"])
+tab1, tab2 ,tab3= st.tabs(["📈 Talk Here", ":smile PDF","🗃 Relevant Documents"])
 
 tab1.markdown(
-    "<h1 style='text-align: center;'>Chat With PDF</h1>",
+    "<h1 style='text-align: center;'>Talk With PDF</h1>",
     unsafe_allow_html=True,
 )
 
@@ -67,7 +67,7 @@ embeddings = CohereEmbeddings(
 if uploaded_file is not None:
     save_uploadedfile(uploaded_file)
     tab1.markdown(
-        "<h3 style='text-align: center;'>Now You Are Chatting With "
+        "<h3 style='text-align: center;'>Now You Are Talking With "
         + uploaded_file.name
         + "</h3>",
         unsafe_allow_html=True,
