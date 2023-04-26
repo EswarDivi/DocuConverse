@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import time
+from streamlit_chat import message
+import random
+
 
 # Set page title
 st.set_page_config(page_title="Demo Streamlit App")
@@ -16,32 +19,36 @@ options = [
     "Interactive Input Elements",
     "Chart Elements",
     "Progress and Status Elements",
+    "StreamlitChat",
 ]
 choice = st.sidebar.radio("Select an option", options)
 
 
 if choice == "Displaying Text":
-    st.text("Anokha Demo")
+    st.write("Streamlit  Demo")
     st.code("st.text()", language="python")
-    st.markdown("# This is Heading 1 in Markdown")
+
+    st.header("This is Heading 1 in Markdown")
     st.code("st.markdown()", language="python")
+
     st.title("This is a title")
     st.code("st.title()", language="python")
+
     st.header("Header")
     st.code("st.header()", language="python")
+
     st.subheader("Sub Header")
     st.code("st.subheader()", language="python")
-    st.latex(
-        r"""
-    A_x=Bx+y     """
-    )
-    st.code("st.latex()", language="python")
-    st.write("Can Display a Lot Other Things")
-    st.code("st.write()", language="python")
-    st.divider()
-    st.subheader("Above is Divider")
-    st.code("st.divider()", language="python")
 
+    st.latex(r"x^2 + y^2 = z^2")
+    st.code("st.latex()", language="python")
+
+    st.write("Streamlit can display a lot of other things too!")
+    st.code("st.write()", language="python")
+
+    st.divider()
+    st.subheader("Above is a divider")
+    st.code("st.divider()", language="python")
 
 elif choice == "Data Elements":
     st.header("Data Elements")
@@ -137,8 +144,9 @@ elif choice == "Chart Elements":
     st.header("Map")
 
     df = pd.DataFrame(
-    np.random.randn(100, 2) / [50, 50] + [11.016844, 76.955833],
-    columns=['lat', 'lon'])
+        np.random.randn(100, 2) / [50, 50] + [11.016844, 76.955833],
+        columns=["lat", "lon"],
+    )
 
     st.map(df)
 
@@ -159,3 +167,13 @@ elif choice == "Progress and Status Elements":
     st.success("Success message")
     e = RuntimeError("This is an exception of type RuntimeError which never Happended")
     st.exception(e)
+
+elif choice == "StreamlitChat":
+    # accept input from user
+    user_input = st.text_input("You:", key="input")
+    if user_input:
+        message(f"You: {user_input}", is_user=True)
+        random_number = random.randint(0, 100)
+        message(
+            f"Bot: Hi there! I think You Lucky Number is {random_number}", is_user=False
+        )
