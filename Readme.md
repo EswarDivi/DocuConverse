@@ -15,7 +15,7 @@ To run this project, you will need to add the following variables `cohere_apikey
 
 For PDF Chatbot
 
-<https://talkwithpdf.streamlit.app/>
+<https://chatwithpdf.streamlit.app/>
 
 For Widgets
 

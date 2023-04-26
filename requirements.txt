@@ -1,4 +1,3 @@
-huggingface_hub
 chromadb
 langchain
 unstructured
@@ -6,5 +5,4 @@ unstructured[local-inference]
 gradio
 streamlit
 streamlit-chat
-openai
 cohere
