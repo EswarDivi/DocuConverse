@@ -3,7 +3,7 @@
 
 ## Conversational AI Chatbot - Interact with Documents like never before
 
->> The Art of Building Intelligent Applications with Langchain and Streamlit
+`The Art of Building Intelligent Applications with Langchain and Streamlit`
 
 This is a Streamlit app that allows users to chat with a PDF document using a conversational AI model. The app uses [Cohere](https://cohere.com/) for language modeling and question answering, and [Chroma](https://github.com/chroma-core/chroma) for document indexing and [Langchain](https://github.com/hwchase17/langchain) for chaining all these together.
 
