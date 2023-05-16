@@ -18,6 +18,8 @@ For PDF Chatbot
 
 <https://chatwithpdf.streamlit.app/>
 
+<https://huggingface.co/spaces/eswardivi/ChatwithPdf/>
+
 For Widgets (Streamlit Demo)
 
 <https://widgets.streamlit.app/>
