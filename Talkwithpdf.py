@@ -52,7 +52,7 @@ if not os.path.exists("./tempfolder"):
 tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 Relevant Documents"])
 
 tab1.markdown(
-    "<h1 style='text-align: center;'>Chat With PDF</h1><h4 style='text-align: center;'>Powered by Cohere</h4><p style='text-align: center;'>For uninterrupted usage, visit the <a href='https://huggingface.co/spaces/eswardivi/ChatwithPdf' target='_blank'>Hugging Face model</a></p>",
+    "<h1 style='text-align: center;'>Chat With PDF</h1><h4 style='text-align: center;'>Powered by Cohere</h4><p style='text-align: center;'>For uninterrupted usage, visit the <a href='https://huggingface.co/spaces/eswardivi/ChatwithPdf' target='_blank'>HuggingFace Space</a></p>",
     unsafe_allow_html=True,
 )
 
