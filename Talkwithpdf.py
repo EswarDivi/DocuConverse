@@ -9,6 +9,28 @@ from langchain.chains import RetrievalQA
 from langchain.embeddings import CohereEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.llms import Cohere
+import time
+import threading
+
+# Deleting the tempfolder every 2 hours
+def delete_tempfolder():
+    while True:
+        # Delete the tempfolder directory
+        if os.path.exists("./tempfolder"):
+            # Remove all files and subdirectories in tempfolder
+            for root, dirs, files in os.walk("./tempfolder", topdown=False):
+                for file in files:
+                    os.remove(os.path.join(root, file))
+                for dir in dirs:
+                    os.rmdir(os.path.join(root, dir))
+            os.rmdir("./tempfolder")
+        
+        # Sleep for 2 hours
+        time.sleep(2 * 60 * 60)
+
+# Start the function in a separate thread
+thread = threading.Thread(target=delete_tempfolder)
+thread.start()
 
 # Setting Up API Tokens
 # Create .streamlit Folder in Root Directory
@@ -18,7 +40,7 @@ from langchain.llms import Cohere
 
 
 # Setting Up Streamlit Page
-st.set_page_config(page_title="Talk With PDF", page_icon=":smile:")
+st.set_page_config(page_title="Chat With PDF", page_icon=":smile:")
 
 
 # Creating Temp Folder
@@ -27,10 +49,10 @@ if not os.path.exists("./tempfolder"):
 
 
 # tabs
-tab1, tab2 = st.tabs(["📈 Talk Here", "🗃 Relevant Documents"])
+tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 Relevant Documents"])
 
 tab1.markdown(
-    "<h1 style='text-align: center;'>Talk With PDF</h1>",
+    "<h1 style='text-align: center;'>Chat With PDF</h1><h4 style='text-align: center;'>Powered by Cohere</h4><p style='text-align: center;'>For uninterrupted usage, visit the <a href='https://huggingface.co/spaces/eswardivi/ChatwithPdf' target='_blank'>Hugging Face model</a></p>",
     unsafe_allow_html=True,
 )
 
@@ -64,7 +86,7 @@ def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
     prompt_template = """ 
-    Your are an AI Chatbot devolped to help users to talk to a PDF document.Use the following pieces of context to answer the question at the end.Greet Users!!
+    Your are an AI Chatbot devolped to help users to Chat to a PDF document.Use the following pieces of context to answer the question at the end.Greet Users!!
     {context}
 
     {question}
@@ -94,13 +116,17 @@ def PDF_loader(document):
 
 if uploaded_file is not None:
     save_uploadedfile(uploaded_file)
+    file_size = os.path.getsize(f"tempfolder/{uploaded_file.name}") / (1024 * 1024)  # Size in MB
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{current_time}] Uploaded PDF: {file_size} MB")
     PDF_loader("tempfolder/" + uploaded_file.name)
     tab1.markdown(
-        "<h3 style='text-align: center;'>Now You Are Talking With "
+        "<h3 style='text-align: center;'>Now You Are Chatting With "
         + uploaded_file.name
         + "</h3>",
         unsafe_allow_html=True,
     )
+
 
 # Session State
 if "chat_history" not in st.session_state:

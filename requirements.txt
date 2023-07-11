@@ -1,5 +1,5 @@
 chromadb
-langchain
+langchain==0.0.191
 unstructured
 unstructured[local-inference]
 streamlit
