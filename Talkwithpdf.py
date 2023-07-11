@@ -15,6 +15,7 @@ import datetime
 
 # Deleting the tempfolder every 2 hours
 def delete_tempfolder():
+    time.sleep(2 * 60 * 60)
     while True:
         # Delete the tempfolder directory
         if os.path.exists("./tempfolder"):
@@ -26,7 +27,6 @@ def delete_tempfolder():
                     os.rmdir(os.path.join(root, dir))
         
         # Sleep for 2 hours
-        time.sleep(2 * 60 * 60)
 
 # Start the function in a separate thread
 thread = threading.Thread(target=delete_tempfolder)
