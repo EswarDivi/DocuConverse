@@ -11,7 +11,7 @@ from langchain.prompts import PromptTemplate
 from langchain.llms import Cohere
 import time
 import threading
-import datetime
+from datetime import datetime
 
 # Deleting the tempfolder every 2 hours
 def delete_tempfolder():
