@@ -14,26 +14,6 @@ import threading
 from datetime import datetime
 
 
-
-# Deleting the tempfolder every 2 hours
-def delete_tempfolder():
-    time.sleep(2 * 60 * 60)
-    while True:
-        # Delete the tempfolder directory
-        if os.path.exists("./tempfolder"):
-            # Remove all files and subdirectories in tempfolder
-            for root, dirs, files in os.walk("./tempfolder", topdown=False):
-                for file in files:
-                    os.remove(os.path.join(root, file))
-                for dir in dirs:
-                    os.rmdir(os.path.join(root, dir))
-        
-        # Sleep for 2 hours
-
-# Start the function in a separate thread
-thread = threading.Thread(target=delete_tempfolder)
-thread.start()
-
 # Setting Up API Tokens
 # Create .streamlit Folder in Root Directory
 # Create a File secrets.toml
