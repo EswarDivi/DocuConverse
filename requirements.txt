@@ -1,3 +1,4 @@
+pysqlite3-binary
 chromadb
 langchain
 unstructured
