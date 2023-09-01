@@ -1,4 +1,8 @@
 # Import Required Libraries
+__import__("pysqlite3")
+import sys
+
+sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 import os
 import streamlit as st
 from streamlit_chat import message
@@ -9,8 +13,6 @@ from langchain.chains import RetrievalQA
 from langchain.embeddings import CohereEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.llms import Cohere
-import time
-import threading
 from datetime import datetime
 
 
@@ -31,10 +33,14 @@ if not os.path.exists("./tempfolder"):
 
 
 # tabs
-tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 Relevant Documents"])
+tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 Relevant Chunks"])
 
 tab1.markdown(
-    "<h1 style='text-align: center;'>Chat With PDF</h1><h4 style='text-align: center;'>Powered by Cohere</h4><p style='text-align: center;'>For uninterrupted usage, visit the <a href='https://huggingface.co/spaces/eswardivi/ChatwithPdf' target='_blank'>HuggingFace Space</a></p>",
+    """
+    <h1 style='text-align: center;'>Chat With PDF</h1>
+    <h4 style='text-align: center;'>Powered by Cohere</h4>
+    <p style='text-align: center;'>For uninterrupted usage, visit the <a href='https://huggingface.co/spaces/eswardivi/ChatwithPdf' target='_blank'>HuggingFace Space</a></p>
+    """,
     unsafe_allow_html=True,
 )
 
@@ -52,10 +58,14 @@ def save_uploadedfile(uploadedfile):
 # Creating Sidebar for Utilites
 with st.sidebar:
     st.title("Upload PDF")
+    st.write("For any Queries, please feel free to contact")
+    st.write("Email: [eswar.divi.902@gmail.com](mailto:eswar.divi.902@gmail.com)")
+    st.write("GitHub: [github.com/EswarDivi](https://github.com/EswarDivi)")
     uploaded_file = st.file_uploader("Choose a file", type=["pdf"])
     temp_r = st.slider("Temperature", 0.1, 0.9, 0.3, 0.1)
     chunksize = st.slider("Chunk Size for Splitting Document ", 256, 1024, 300, 10)
     clear_button = st.button("Clear Conversation", key="clear")
+
 
 # Initialzing Text Splitter
 text_splitter = CharacterTextSplitter(chunk_size=chunksize, chunk_overlap=10)
@@ -68,7 +78,7 @@ def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
     prompt_template = """ 
-    Your are an AI Chatbot devolped to help users to Chat to a PDF document.Use the following pieces of context to answer the question at the end.Greet Users!!
+    I am an AI chatbot that helps users chat with PDF documents. I can use the following pieces of context to answer your questions Relevant Parts of PDF Document. How may I help you today?  
     {context}
 
     {question}
@@ -98,7 +108,9 @@ def PDF_loader(document):
 
 if uploaded_file is not None:
     save_uploadedfile(uploaded_file)
-    file_size = os.path.getsize(f"tempfolder/{uploaded_file.name}") / (1024 * 1024)  # Size in MB
+    file_size = os.path.getsize(f"tempfolder/{uploaded_file.name}") / (
+        1024 * 1024
+    )  # Size in MB
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{current_time}] Uploaded PDF: {file_size} MB")
     PDF_loader("tempfolder/" + uploaded_file.name)

@@ -1,8 +1,8 @@
 chromadb
-typing-extensions==4.5.0
-langchain==0.0.191
+langchain
 unstructured
 unstructured[local-inference]
-streamlit
+streamlit==1.24.0
 streamlit-chat
 cohere
+altair==4.0
