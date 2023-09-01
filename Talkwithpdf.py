@@ -62,8 +62,8 @@ with st.sidebar:
     st.write("Email: [eswar.divi.902@gmail.com](mailto:eswar.divi.902@gmail.com)")
     st.write("GitHub: [github.com/EswarDivi](https://github.com/EswarDivi)")
     uploaded_file = st.file_uploader("Choose a file", type=["pdf"])
-    temp_r = st.slider("Temperature", 0.1, 0.9, 0.3, 0.1)
-    chunksize = st.slider("Chunk Size for Splitting Document ", 256, 1024, 300, 10)
+    temp_r = st.slider("Temperature", 0.1, 0.9, 0.45, 0.1)
+    chunksize = st.slider("Chunk Size for Splitting Document ", 256, 1024, 400, 10)
     clear_button = st.button("Clear Conversation", key="clear")
 
 
@@ -78,7 +78,9 @@ def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
     prompt_template = """ 
-    I am an AI chatbot that helps users chat with PDF documents. I can use the following pieces of context to answer your questions Relevant Parts of PDF Document. How may I help you today?  
+    System Prompt:
+    Your are an AI chatbot that helps users chat with PDF documents. How may I help you today?
+
     {context}
 
     {question}
