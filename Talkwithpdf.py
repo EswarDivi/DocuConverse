@@ -7,7 +7,7 @@ import os
 import streamlit as st
 from streamlit_chat import message
 from langchain.document_loaders import OnlinePDFLoader
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import CharacterTextSplitter,RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.embeddings import CohereEmbeddings
@@ -68,7 +68,7 @@ with st.sidebar:
 
 
 # Initialzing Text Splitter
-text_splitter = CharacterTextSplitter(chunk_size=chunksize, chunk_overlap=10)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunksize, chunk_overlap=10, separators=[" ", ",", "\n"])
 
 # Intializing Cohere Embdedding
 embeddings = CohereEmbeddings(model="large", cohere_api_key=st.secrets["cohere_apikey"])
