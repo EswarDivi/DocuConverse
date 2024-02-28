@@ -7,3 +7,4 @@ streamlit==1.24.0
 streamlit-chat
 cohere
 altair==4.0
+opencv-python-headless==4.5.3.56
