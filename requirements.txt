@@ -1,10 +1,9 @@
 pysqlite3-binary
-chromadb
-langchain
+chromadb==0.4.7
+langchain==0.0.277
 unstructured
 unstructured[local-inference]
 streamlit==1.24.0
 streamlit-chat
-cohere
+cohere==4.21
 altair==4.0
-opencv-python-headless==4.5.3.56
