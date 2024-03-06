@@ -1,13 +1,12 @@
 # Import Required Libraries
 __import__("pysqlite3")
 import sys
-
 sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 import os
 import streamlit as st
 from streamlit_chat import message
 from langchain.document_loaders import OnlinePDFLoader
-from langchain.text_splitter import CharacterTextSplitter,RecursiveCharacterTextSplitter
+from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.embeddings import CohereEmbeddings
@@ -15,22 +14,12 @@ from langchain.prompts import PromptTemplate
 from langchain.llms import Cohere
 from datetime import datetime
 
-
-# Setting Up API Tokens
-# Create .streamlit Folder in Root Directory
-# Create a File secrets.toml
-# TOML format
-# cohere_apikey="Enter you Key"
-
-
 # Setting Up Streamlit Page
 st.set_page_config(page_title="Chat With PDF", page_icon=":smile:")
-
 
 # Creating Temp Folder
 if not os.path.exists("./tempfolder"):
     os.makedirs("./tempfolder")
-
 
 # tabs
 tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 Relevant Chunks"])
@@ -44,7 +33,6 @@ tab1.markdown(
     unsafe_allow_html=True,
 )
 
-
 # Saving Upload file to tempfolder
 def save_uploadedfile(uploadedfile):
     with open(
@@ -53,7 +41,6 @@ def save_uploadedfile(uploadedfile):
     ) as f:
         f.write(uploadedfile.getbuffer())
     return st.sidebar.success("Saved File")
-
 
 # Creating Sidebar for Utilites
 with st.sidebar:
@@ -66,18 +53,16 @@ with st.sidebar:
     chunksize = st.slider("Chunk Size for Splitting Document ", 256, 1024, 400, 10)
     clear_button = st.button("Clear Conversation", key="clear")
 
-
 # Initialzing Text Splitter
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunksize, chunk_overlap=10, separators=[" ", ",", "\n"])
 
 # Intializing Cohere Embdedding
 embeddings = CohereEmbeddings(model="large", cohere_api_key=st.secrets["cohere_apikey"])
 
-
 def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
-    prompt_template = """ 
+    prompt_template = """
     System Prompt:
     Your are an AI chatbot that helps users chat with PDF documents. How may I help you today?
 
@@ -90,10 +75,11 @@ def PDF_loader(document):
     )
     chain_type_kwargs = {"prompt": PROMPT}
     texts = text_splitter.split_documents(documents)
-    global db
-    db = Chroma.from_documents(texts, embeddings)
+
+    # Create a new instance of Chroma with a unique persist_directory for each file
+    db = Chroma.from_documents(texts,embeddings,persist_directory=f"./tempfolder/db_{os.path.basename(document).split('.')[0]}")
     retriever = db.as_retriever()
-    global qa
+
     qa = RetrievalQA.from_chain_type(
         llm=Cohere(
             model="command-xlarge-nightly",
@@ -105,17 +91,14 @@ def PDF_loader(document):
         return_source_documents=True,
         chain_type_kwargs=chain_type_kwargs,
     )
-    return "Ready"
-
+    return qa
 
 if uploaded_file is not None:
     save_uploadedfile(uploaded_file)
-    file_size = os.path.getsize(f"tempfolder/{uploaded_file.name}") / (
-        1024 * 1024
-    )  # Size in MB
+    file_size = os.path.getsize(f"tempfolder/{uploaded_file.name}") / (1024 * 1024)  # Size in MB
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{current_time}] Uploaded PDF: {file_size} MB")
-    PDF_loader("tempfolder/" + uploaded_file.name)
+    qa = PDF_loader("tempfolder/" + uploaded_file.name)
     tab1.markdown(
         "<h3 style='text-align: center;'>Now You Are Chatting With "
         + uploaded_file.name
@@ -123,19 +106,8 @@ if uploaded_file is not None:
         unsafe_allow_html=True,
     )
 
-
-# Session State
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = []
-if "generated" not in st.session_state:
-    st.session_state["generated"] = []
-if "past" not in st.session_state:
-    st.session_state["past"] = []
-
-
-# Generating Response
-def generate_response(query):
-    result = qa({"query": query, "chat_history": st.session_state["chat_history"]})
+def generate_response(query, qa):
+    result = qa({"query": query, "chat_history": ""})
 
     tab2.markdown(
         "<h3 style='text-align: center;'>Relevant Documents Metadata</h3>",
@@ -146,46 +118,43 @@ def generate_response(query):
     result["result"] = result["result"]
     return result["result"]
 
+# Session State
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Creating Containers
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-response_container = tab1.container()
-container = tab1.container()
-
-
-with container:
-    with st.form(key="my_form", clear_on_submit=True):
-        user_input = st.text_input("You:", key="input")
-        submit_button = st.form_submit_button(label="Send")
-
-    if user_input and submit_button:
-        if uploaded_file is not None:
-            output = generate_response(user_input)
-            print(output)
-            st.session_state["past"].append(user_input)
-            st.session_state["generated"].append(output)
-            st.session_state["chat_history"] = [(user_input, output)]
-        else:
-            st.session_state["past"].append(user_input)
-            st.session_state["generated"].append(
-                "Please go ahead and upload the PDF in the sidebar, it would be great to have it there."
-            )
-
-if st.session_state["generated"]:
-    with response_container:
-        for i in range(len(st.session_state["generated"])):
-            message(
-                st.session_state["past"][i],
-                is_user=True,
-                key=str(i) + "_user",
-                avatar_style="adventurer",
-                seed=123,
-            )
-            message(st.session_state["generated"][i], key=str(i))
+if prompt := st.chat_input("What is up?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    if uploaded_file is not None:
+        data = {"question": prompt}
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            while not full_response:
+                with st.spinner("Thinking..."):
+                    Output = generate_response(prompt, qa)
+                    full_response = Output if Output else "Failed to get the response."
+                fr = ""
+                # Convert the response to a string if needed
+                full_response = str(full_response)
+                for i in full_response:
+                    import time
+                    time.sleep(0.02)
+                    fr += i
+                    message_placeholder.write(fr + "▌")
+                message_placeholder.write(f"{full_response}")
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+    else:
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            message_placeholder.write('Please go ahead and upload the PDF in the sidebar, it would be great to have it there.')
+        st.session_state.messages.append({"role": "assistant", "content": "Please go ahead and upload the PDF in the sidebar, it would be great to have it there."})
 
 # Enabling Clear button
-
 if clear_button:
-    st.session_state["generated"] = []
-    st.session_state["past"] = []
-    st.session_state["chat_history"] = []
+    st.session_state.messages = []
