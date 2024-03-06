@@ -106,6 +106,18 @@ if uploaded_file is not None:
         unsafe_allow_html=True,
     )
 
+def generate_response(query, qa):
+    result = qa({"query": query, "chat_history": st.session_state["chat_history"]})
+
+    tab2.markdown(
+        "<h3 style='text-align: center;'>Relevant Documents Metadata</h3>",
+        unsafe_allow_html=True,
+    )
+
+    tab2.write(result["source_documents"])
+    result["result"] = result["result"]
+    return result["result"]
+
 # Session State
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -125,7 +137,7 @@ if prompt := st.chat_input("What is up?"):
             full_response = ""
             while not full_response:
                 with st.spinner("Thinking..."):
-                    Output = qa(data)
+                    Output = generate_response(prompt, qa)
                     full_response = Output if Output else "Failed to get the response."
                 fr = ""
                 # Convert the response to a string if needed
