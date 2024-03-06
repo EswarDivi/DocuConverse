@@ -15,23 +15,60 @@ from langchain.llms import Cohere
 from datetime import datetime
 
 # Setting Up Streamlit Page
-st.set_page_config(page_title="Chat With PDF", page_icon=":smile:")
+st.set_page_config(page_title="Chat With PDF", page_icon=":smile:", layout="wide")
 
 # Creating Temp Folder
 if not os.path.exists("./tempfolder"):
     os.makedirs("./tempfolder")
 
-# tabs
-tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 Relevant Chunks"])
-
-tab1.markdown(
+# Styling
+st.markdown(
     """
-    <h1 style='text-align: center;'>Chat With PDF</h1>
-    <h4 style='text-align: center;'>Powered by Cohere</h4>
-    <p style='text-align: center;'>For uninterrupted usage, visit the <a href='https://huggingface.co/spaces/eswardivi/ChatwithPdf' target='_blank'>HuggingFace Space</a></p>
+    <style>
+        .sidebar .sidebar-content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .main {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-message {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .chat-input {
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
     """,
     unsafe_allow_html=True,
 )
+
+# tabs
+tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 Relevant Chunks"])
+
+with tab1:
+    st.markdown(
+        """
+        <div class="main">
+            <h1 style='text-align: center; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;'>Chat With PDF</h1>
+            <h4 style='text-align: center; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;'>Powered by Cohere</h4>
+            <p style='text-align: center;'>For uninterrupted usage, visit the <a href='https://huggingface.co/spaces/eswardivi/ChatwithPdf' target='_blank'>HuggingFace Space</a></p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # Saving Upload file to tempfolder
 def save_uploadedfile(uploadedfile):
@@ -44,10 +81,18 @@ def save_uploadedfile(uploadedfile):
 
 # Creating Sidebar for Utilites
 with st.sidebar:
-    st.title("Upload PDF")
-    st.write("For any Queries, please feel free to contact")
-    st.write("Email: [eswar.divi.902@gmail.com](mailto:eswar.divi.902@gmail.com)")
-    st.write("GitHub: [github.com/EswarDivi](https://github.com/EswarDivi)")
+    st.markdown(
+        """
+        <div class="sidebar-content">
+            <h2 style='font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;'>Upload PDF</h2>
+            <p>For any Queries, please feel free to contact:</p>
+            <p><a href="mailto:eswar.divi.902@gmail.com">Email</a></p>
+            <p><a href="https://github.com/EswarDivi" target="_blank">GitHub</a></p>
+            <hr>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     uploaded_file = st.file_uploader("Choose a file", type=["pdf"])
     temp_r = st.slider("Temperature", 0.1, 0.9, 0.45, 0.1)
     chunksize = st.slider("Chunk Size for Splitting Document ", 256, 1024, 400, 10)
@@ -100,9 +145,11 @@ if uploaded_file is not None:
     print(f"[{current_time}] Uploaded PDF: {file_size} MB")
     qa = PDF_loader("tempfolder/" + uploaded_file.name)
     tab1.markdown(
-        "<h3 style='text-align: center;'>Now You Are Chatting With "
-        + uploaded_file.name
-        + "</h3>",
+        """
+        <div class="main">
+            <h3 style='text-align: center; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;'>Now You Are Chatting With {}</h3>
+        </div>
+        """.format(uploaded_file.name),
         unsafe_allow_html=True,
     )
 
@@ -110,7 +157,11 @@ def generate_response(query, qa):
     result = qa({"query": query, "chat_history": ""})
 
     tab2.markdown(
-        "<h3 style='text-align: center;'>Relevant Documents Metadata</h3>",
+        """
+        <div class="main">
+            <h3 style='text-align: center; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;'>Relevant Documents Metadata</h3>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
@@ -123,13 +174,13 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+    with st.chat_message("message-container", message["role"]):
+        st.markdown(f"<div class='chat-message'>{message['content']}</div>", unsafe_allow_html=True)
 
-if prompt := st.chat_input("What is up?"):
+if prompt := st.chat_input("What is up?", key="chat_input", placeholder="Type your message here...", disabled=False):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.markdown(f"<div class='chat-message'>{prompt}</div>", unsafe_allow_html=True)
     if uploaded_file is not None:
         data = {"question": prompt}
         with st.chat_message("assistant"):
@@ -140,19 +191,18 @@ if prompt := st.chat_input("What is up?"):
                     Output = generate_response(prompt, qa)
                     full_response = Output if Output else "Failed to get the response."
                 fr = ""
-                # Convert the response to a string if needed
                 full_response = str(full_response)
                 for i in full_response:
                     import time
                     time.sleep(0.02)
                     fr += i
-                    message_placeholder.write(fr + "▌")
-                message_placeholder.write(f"{full_response}")
+                    message_placeholder.markdown(f"<div class='chat-message'>{fr}▌</div>", unsafe_allow_html=True)
+                message_placeholder.markdown(f"<div class='chat-message'>{full_response}</div>", unsafe_allow_html=True)
             st.session_state.messages.append({"role": "assistant", "content": full_response})
     else:
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
-            message_placeholder.write('Please go ahead and upload the PDF in the sidebar, it would be great to have it there.')
+            message_placeholder.markdown("<div class='chat-message'>Please go ahead and upload the PDF in the sidebar, it would be great to have it there.</div>", unsafe_allow_html=True)
         st.session_state.messages.append({"role": "assistant", "content": "Please go ahead and upload the PDF in the sidebar, it would be great to have it there."})
 
 # Enabling Clear button
