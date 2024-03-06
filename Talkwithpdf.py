@@ -144,14 +144,14 @@ if prompt := st.chat_input("What is up?"):
                 full_response = str(full_response)
                 for i in full_response:
                     import time
-                    time.sleep(0.05)
+                    time.sleep(0.02)
                     fr += i
                     message_placeholder.write(fr + "▌")
                 message_placeholder.write(f"{full_response}")
             st.session_state.messages.append({"role": "assistant", "content": full_response})
     else:
         with st.chat_message("assistant"):
-            message_placeholder='Please go ahead and upload the PDF in the sidebar, it would be great to have it there.'
+            message_placeholder.write('Please go ahead and upload the PDF in the sidebar, it would be great to have it there.')
         st.session_state.messages.append({"role": "assistant", "content": "Please go ahead and upload the PDF in the sidebar, it would be great to have it there."})
 
 # Enabling Clear button
