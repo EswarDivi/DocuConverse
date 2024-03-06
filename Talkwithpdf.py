@@ -77,7 +77,8 @@ def PDF_loader(document):
     texts = text_splitter.split_documents(documents)
 
     # Create a new instance of Chroma with a unique persist_directory for each file
-    db = Chroma(documents=texts,persist_directory=f"./tempfolder/db_{os.path.basename(document).split('.')[0]}", embedding_function=embeddings)
+    db = Chroma(persist_directory=f"./tempfolder/db_{os.path.basename(document).split('.')[0]}", embedding_function=embeddings)
+    db.persist(texts)
     retriever = db.as_retriever()
 
     qa = RetrievalQA.from_chain_type(
