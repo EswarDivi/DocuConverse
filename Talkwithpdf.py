@@ -107,62 +107,39 @@ if uploaded_file is not None:
     )
 
 # Session State
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = []
-if "generated" not in st.session_state:
-    st.session_state["generated"] = []
-if "past" not in st.session_state:
-    st.session_state["past"] = []
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Generating Response
-def generate_response(query, qa):
-    result = qa({"query": query, "chat_history": st.session_state["chat_history"]})
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-    tab2.markdown(
-        "<h3 style='text-align: center;'>Relevant Documents Metadata</h3>",
-        unsafe_allow_html=True,
-    )
-
-    tab2.write(result["source_documents"])
-    result["result"] = result["result"]
-    return result["result"]
-
-# Creating Containers
-response_container = tab1.container()
-container = tab1.container()
-
-with container:
-    with st.form(key="my_form", clear_on_submit=True):
-        user_input = st.text_input("You:", key="input")
-        submit_button = st.form_submit_button(label="Send")
-
-    if user_input and submit_button:
-        if uploaded_file is not None:
-            output = generate_response(user_input, qa)
-            print(output)
-            st.session_state["past"].append(user_input)
-            st.session_state["generated"].append(output)
-            st.session_state["chat_history"] = [(user_input, output)]
-        else:
-            st.session_state["past"].append(user_input)
-            st.session_state["generated"].append(
-                "Please go ahead and upload the PDF in the sidebar, it would be great to have it there."
-            )
-
-if st.session_state["generated"]:
-    with response_container:
-        for i in range(len(st.session_state["generated"])):
-            message(
-                st.session_state["past"][i],
-                is_user=True,
-                key=str(i) + "_user",
-                avatar_style="adventurer",
-                seed=123,
-            )
-            message(st.session_state["generated"][i], key=str(i))
+if prompt := st.chat_input("What is up?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    if uploaded_file is not None:
+        data = {"question": prompt}
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            while not full_response:
+                with st.spinner("Thinking..."):
+                    Output = qa(data)
+                    full_response = Output if Output else "Failed to get the response."
+                fr = ""
+                # Convert the response to a string if needed
+                full_response = str(full_response)
+                for i in full_response:
+                    import time
+                    time.sleep(0.05)
+                    fr += i
+                    message_placeholder.write(fr + "▌")
+                message_placeholder.write(f"{full_response}")
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+    else:
+        st.session_state.messages.append({"role": "assistant", "content": "Please go ahead and upload the PDF in the sidebar, it would be great to have it there."})
 
 # Enabling Clear button
 if clear_button:
-    st.session_state["generated"] = []
-    st.session_state["past"] = []
-    st.session_state["chat_history"] = []
+    st.session_state.messages = []
