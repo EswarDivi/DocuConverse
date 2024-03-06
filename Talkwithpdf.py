@@ -151,6 +151,7 @@ if prompt := st.chat_input("What is up?"):
             st.session_state.messages.append({"role": "assistant", "content": full_response})
     else:
         with st.chat_message("assistant"):
+            message_placeholder = st.empty()
             message_placeholder.write('Please go ahead and upload the PDF in the sidebar, it would be great to have it there.')
         st.session_state.messages.append({"role": "assistant", "content": "Please go ahead and upload the PDF in the sidebar, it would be great to have it there."})
 
