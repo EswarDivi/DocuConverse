@@ -1,13 +1,12 @@
 # Import Required Libraries
 __import__("pysqlite3")
 import sys
-
 sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 import os
 import streamlit as st
 from streamlit_chat import message
 from langchain.document_loaders import OnlinePDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.embeddings import CohereEmbeddings
@@ -22,7 +21,7 @@ st.set_page_config(page_title="Chat With PDF", page_icon=":smile:")
 if not os.path.exists("./tempfolder"):
     os.makedirs("./tempfolder")
 
-# Tabs
+# tabs
 tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 Relevant Chunks"])
 
 tab1.markdown(
@@ -63,7 +62,7 @@ embeddings = CohereEmbeddings(model="large", cohere_api_key=st.secrets["cohere_a
 def PDF_loader(document):
     loader = OnlinePDFLoader(document)
     documents = loader.load()
-    prompt_template = """ 
+    prompt_template = """
     System Prompt:
     Your are an AI chatbot that helps users chat with PDF documents. How may I help you today?
 
@@ -76,8 +75,11 @@ def PDF_loader(document):
     )
     chain_type_kwargs = {"prompt": PROMPT}
     texts = text_splitter.split_documents(documents)
-    db = Chroma.from_documents(texts, embeddings)
+
+    # Create a new instance of Chroma with a unique persist_directory for each file
+    db = Chroma(documents=texts,persist_directory=f"./tempfolder/db_{document.name}", embedding_function=embeddings)
     retriever = db.as_retriever()
+
     qa = RetrievalQA.from_chain_type(
         llm=Cohere(
             model="command-xlarge-nightly",
@@ -90,6 +92,19 @@ def PDF_loader(document):
         chain_type_kwargs=chain_type_kwargs,
     )
     return qa
+
+if uploaded_file is not None:
+    save_uploadedfile(uploaded_file)
+    file_size = os.path.getsize(f"tempfolder/{uploaded_file.name}") / (1024 * 1024)  # Size in MB
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{current_time}] Uploaded PDF: {file_size} MB")
+    qa = PDF_loader("tempfolder/" + uploaded_file.name)
+    tab1.markdown(
+        "<h3 style='text-align: center;'>Now You Are Chatting With "
+        + uploaded_file.name
+        + "</h3>",
+        unsafe_allow_html=True,
+    )
 
 # Session State
 if "chat_history" not in st.session_state:
@@ -123,8 +138,8 @@ with container:
 
     if user_input and submit_button:
         if uploaded_file is not None:
-            qa = PDF_loader("tempfolder/" + uploaded_file.name)
             output = generate_response(user_input, qa)
+            print(output)
             st.session_state["past"].append(user_input)
             st.session_state["generated"].append(output)
             st.session_state["chat_history"] = [(user_input, output)]
