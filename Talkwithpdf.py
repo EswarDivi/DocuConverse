@@ -107,7 +107,7 @@ if uploaded_file is not None:
     )
 
 def generate_response(query, qa):
-    result = qa({"query": query, "chat_history": st.session_state["chat_history"]})
+    result = qa({"query": query, "chat_history": ""})
 
     tab2.markdown(
         "<h3 style='text-align: center;'>Relevant Documents Metadata</h3>",
@@ -150,6 +150,8 @@ if prompt := st.chat_input("What is up?"):
                 message_placeholder.write(f"{full_response}")
             st.session_state.messages.append({"role": "assistant", "content": full_response})
     else:
+        with st.chat_message("assistant"):
+            message_placeholder='Please go ahead and upload the PDF in the sidebar, it would be great to have it there.'
         st.session_state.messages.append({"role": "assistant", "content": "Please go ahead and upload the PDF in the sidebar, it would be great to have it there."})
 
 # Enabling Clear button
