@@ -27,8 +27,6 @@ tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 Relevant Chunks"])
 tab1.markdown(
     """
     <h1 style='text-align: center;'>Chat With PDF</h1>
-    <h4 style='text-align: center;'>Powered by Cohere</h4>
-    <p style='text-align: center;'>For uninterrupted usage, visit the <a href='https://huggingface.co/spaces/eswardivi/ChatwithPdf' target='_blank'>HuggingFace Space</a></p>
     """,
     unsafe_allow_html=True,
 )
@@ -48,6 +46,8 @@ with st.sidebar:
     st.write("For any Queries, please feel free to contact")
     st.write("Email: [eswar.divi.902@gmail.com](mailto:eswar.divi.902@gmail.com)")
     st.write("GitHub: [github.com/EswarDivi](https://github.com/EswarDivi)")
+    st.write("<h4>Powered by Cohere</h4>", unsafe_allow_html=True)
+    st.write("<p>For uninterrupted usage, visit the <a href='https://huggingface.co/spaces/eswardivi/ChatwithPdf' target='_blank'>HuggingFace Space</a></p>", unsafe_allow_html=True)
     uploaded_file = st.file_uploader("Choose a file", type=["pdf"])
     temp_r = st.slider("Temperature", 0.1, 0.9, 0.45, 0.1)
     chunksize = st.slider("Chunk Size for Splitting Document ", 256, 1024, 400, 10)
