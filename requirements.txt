@@ -4,6 +4,5 @@ langchain==0.0.277
 unstructured
 unstructured[local-inference]
 streamlit==1.24.0
-streamlit-chat
 cohere==4.21
 altair==4.0
