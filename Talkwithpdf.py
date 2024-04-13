@@ -3,6 +3,7 @@ __import__("pysqlite3")
 import sys
 sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 import os
+import base64
 import streamlit as st
 from langchain.document_loaders import OnlinePDFLoader
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
