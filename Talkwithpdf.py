@@ -4,7 +4,6 @@ import sys
 sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 import os
 import streamlit as st
-from streamlit_chat import message
 from langchain.document_loaders import OnlinePDFLoader
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
