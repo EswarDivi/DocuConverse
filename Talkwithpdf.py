@@ -166,4 +166,4 @@ if uploaded_file is not None:
         #     base64_pdf = base64.b64encode(file.read()).decode("utf-8")
         #     pdf_display = f"""<embed src="data:application/pdf;base64,{base64_pdf}" type="application/pdf" style="width:100%; height:100vh;"></embed>"""
         #     st.markdown(pdf_display, unsafe_allow_html=True)
-        st.markdown("Coming Soon...)
+        st.markdown("Coming Soon...")
