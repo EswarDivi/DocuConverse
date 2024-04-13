@@ -22,7 +22,7 @@ if not os.path.exists("./tempfolder"):
     os.makedirs("./tempfolder")
 
 # tabs
-tab1, tab2 = st.tabs(["📈 Chat Here", "🗃 Relevant Chunks"])
+tab1, tab2, tab3 = st.tabs(["📈 Chat Here", "🗃 Relevant Chunks", "📄 PDF Preview"])
 
 tab1.markdown(
     """
@@ -158,3 +158,11 @@ if prompt := st.chat_input("What is up?"):
 # Enabling Clear button
 if clear_button:
     st.session_state.messages = []
+
+
+if uploaded_file is not None:
+    with tab3:
+        with open(f"tempfolder/{uploaded_file.name}", "rb") as file:
+            base64_pdf = base64.b64encode(file.read()).decode("utf-8")
+            pdf_display = f"""<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="100%" type="application/pdf" style="height:100vh;"></iframe>"""
+            st.markdown(pdf_display, unsafe_allow_html=True)
