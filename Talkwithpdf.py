@@ -200,7 +200,7 @@ if prompt := st.chat_input("What is up?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-    if uploaded_file is not None and cohere_api_key is not None:
+    if uploaded_file is not None and cohere_api_key:
         data = {"question": prompt}
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
