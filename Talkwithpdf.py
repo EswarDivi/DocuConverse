@@ -1,6 +1,7 @@
-__import__('pysqlite3')
+__import__("pysqlite3")
 import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
+sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 import os
 import base64
 from langchain_community.document_loaders import PyPDFLoader
@@ -161,7 +162,7 @@ def PDF_loader(document):
     return qa
 
 
-if uploaded_file is not None and cohere_api_key:
+if uploaded_file is not None and cohere_api_key is not None:
     save_uploadedfile(uploaded_file)
     file_size = os.path.getsize(f"tempfolder/{uploaded_file.name}") / (1024 * 1024)
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -199,7 +200,7 @@ if prompt := st.chat_input("What is up?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-    if uploaded_file is not None:
+    if uploaded_file is not None and cohere_api_key is not None:
         data = {"question": prompt}
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
@@ -224,12 +225,12 @@ if prompt := st.chat_input("What is up?"):
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             message_placeholder.write(
-                "Please go ahead and upload the PDF in the sidebar, it would be great to have it there."
+                "Please go ahead and upload the PDF in the sidebar, it would be great to have it there and make sure API key Entered"
             )
         st.session_state.messages.append(
             {
                 "role": "assistant",
-                "content": "Please go ahead and upload the PDF in the sidebar, it would be great to have it there.",
+                "content": "Please go ahead and upload the PDF in the sidebar, it would be great to have it there and make sure API key Entered",
             }
         )
 
