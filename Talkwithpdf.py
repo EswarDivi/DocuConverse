@@ -162,7 +162,7 @@ def PDF_loader(document):
     return qa
 
 
-if uploaded_file is not None and cohere_api_key is not None:
+if uploaded_file is not None and cohere_api_key:
     save_uploadedfile(uploaded_file)
     file_size = os.path.getsize(f"tempfolder/{uploaded_file.name}") / (1024 * 1024)
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
