@@ -1,8 +1,7 @@
-pysqlite3-binary
-chromadb==0.4.7
-langchain==0.0.277
-unstructured
-unstructured[local-inference]
-streamlit==1.24.0
-cohere==4.21
-altair==4.0
+streamlit==1.33.0
+langchain
+langchain-community
+langchain-experimental
+langchain-chroma
+langchain-cohere
+pypdf
