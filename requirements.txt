@@ -1,3 +1,4 @@
+pysqlite3-binary
 streamlit==1.33.0
 langchain
 langchain-community
