@@ -124,7 +124,7 @@ def PDF_loader(document):
 
     prompt_template = """You are an AI chatbot that helps users chat with PDF documents.
     Use the following pieces of context to answer the question at the end. Please follow the following rules:
-    1. If you find the answer, write the answer in a Elegant way and add the list of sources that are **directly** used to derive the answer. Exclude the sources that are irrelevant to the final answer.
+    1. If you find the answer, write the answer in a Elegant way and add the list of sources that are **directly** used to derive the answer.
     Example:
     The Answer is derived from[1] this page
     [1] Source_ Page:PageNumber
